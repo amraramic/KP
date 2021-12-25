@@ -1,0 +1,22 @@
+{
+  "name": "ra/kp",
+  "type": "project",
+  "authors": [
+    {
+      "name": "Amra Ramic",
+      "email": "amra.ramic@stud.th-rosenheim.de"
+    }
+  ],
+  "require": {
+    "respect/validation": "^2.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^9",
+    "vimeo/psalm": "^3.11"
+  },
+  "autoload": {
+    "psr-4": {
+      "ra\\kp\\": "src/"
+    }
+  }
+}

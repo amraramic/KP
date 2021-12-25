@@ -1,0 +1,22 @@
+stages:
+  - prepare
+  - test
+
+image: thecodingmachine/php:7.4-v3-cli-node12
+
+prepare-dependencies:
+  stage: prepare
+  script:
+    - "composer install"
+  artifacts:
+    name: "prepare-dependencies"
+    expire_in: 45 minutes
+    paths:
+      - vendor
+
+test:
+  stage: test
+  dependencies:
+    - prepare-dependencies
+  script:
+    - "./vendor/bin/psalm --show-info=true"
