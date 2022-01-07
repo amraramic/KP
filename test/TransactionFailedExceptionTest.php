@@ -11,7 +11,7 @@ class TransactionFailedExceptionTest extends TestCase
     {
         $exception = new TransactionFailedException();
 
-        $this->assertEquals("Unfortunately, the transaction could not be carried out. Please try again!", $exception->getErrorMessage());
+        $this->assertEquals("\nUnfortunately, the transaction could not be carried out. Please try again!\n", $exception->getErrorMessage());
 
         $this->expectException(TransactionFailedException::class);
         throw $exception;

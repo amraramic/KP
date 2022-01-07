@@ -6,6 +6,6 @@ class InvalidAccountTypeException extends \Exception
 {
     public function getErrorMessage(): string
     {
-        return "Please chose between savings (S) or checking (C) account\n";
+        return "\nPlease chose between savings (S) or checking (C) account\n";
     }
 }

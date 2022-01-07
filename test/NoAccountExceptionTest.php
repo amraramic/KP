@@ -10,7 +10,7 @@ class NoAccountExceptionTest extends TestCase
     {
         $exception = new NoAccountException();
 
-        $this->assertEquals("An account with this account number does not exists!\n", $exception->getErrorMessage());
+        $this->assertEquals("\nAn account with this account number does not exists!\n", $exception->getErrorMessage());
 
         $this->expectException(NoAccountException::class);
         throw $exception;

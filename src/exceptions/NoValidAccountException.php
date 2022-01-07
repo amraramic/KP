@@ -6,6 +6,11 @@ class NoValidAccountException extends \Exception
 {
     public function getErrorMessage(): string
     {
-        return "The account has to be a saving or a checking account!\n";
+        return "\nThe account has to be a saving or a checking account!\n";
+    }
+
+    public function getCheckingAccountErrorMessage(): string
+    {
+        return "\nThe account has to be a checking account!\n";
     }
 }

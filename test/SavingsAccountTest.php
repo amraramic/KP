@@ -1,6 +1,7 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
+use ra\kp\exceptions\InvalidAmountException;
 use ra\kp\models\Customer;
 use ra\kp\models\SavingsAccount;
 
@@ -19,8 +20,17 @@ class SavingsAccountTest extends TestCase
 
         $this->savingsAccount = new SavingsAccount("100", $customer, 100.0, 0.5);
     }
+
+    /**
+     * @throws InvalidAmountException
+     */
     public function testAddInterest()
     {
+        $this->savingsAccount->setInterestRate(0.0);
+        $this->expectException(InvalidAmountException::class);
+        $this->savingsAccount->addInterest();
+
+        $this->savingsAccount->setInterestRate(0.05);
         $this->savingsAccount->addInterest();
         $this->assertEquals(100.5, $this->savingsAccount->getBalance());
     }

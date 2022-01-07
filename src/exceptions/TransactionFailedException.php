@@ -6,6 +6,6 @@ class TransactionFailedException extends \Exception
 {
     public function getErrorMessage(): string
     {
-        return "Unfortunately, the transaction could not be carried out. Please try again!";
+        return "\nUnfortunately, the transaction could not be carried out. Please try again!\n";
     }
 }

@@ -11,7 +11,7 @@ class NoCustomerExceptionTest extends TestCase
     {
         $exception = new NoCustomerException();
 
-        $this->assertEquals("A customer with this customer number does not exists!\n", $exception->getErrorMessage());
+        $this->assertEquals("\nA customer with this customer number does not exists!\n", $exception->getErrorMessage());
 
         $this->expectException(NoCustomerException::class);
         throw $exception;

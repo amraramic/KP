@@ -4,8 +4,11 @@
 namespace ra\kp\interfaces;
 
 
+use ra\kp\models\Bank;
 use ra\kp\models\BankAccount;
+use ra\kp\models\CheckingAccount;
 use ra\kp\models\Customer;
+use ra\kp\models\SavingsAccount;
 
 interface Banking
 {
@@ -29,9 +32,9 @@ interface Banking
      * @param int $customerNumber
      * @param string $type
      * @param float $balance
-     * @return BankAccount|null
+     * @return BankAccount
      */
-    function createNewAccount(int $customerNumber, string $type, float $balance = 0.0) : ?BankAccount;
+    function createNewAccount(int $customerNumber, string $type, float $balance = 0.0): BankAccount;
 
     /**
      * @param string $firstName

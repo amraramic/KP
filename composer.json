@@ -9,7 +9,8 @@
   ],
   "require": {
     "respect/validation": "^2.0",
-    "ext-readline": "*"
+    "ext-readline": "*",
+    "ext-ncurses": "*"
   },
   "require-dev": {
     "phpunit/phpunit": "^9",

@@ -37,7 +37,7 @@ class BankAccount
     {
         if($amount < $this->balance){
             $this->balance = $this->balance - $amount;
-            printf("You have successfully debit %s $ to %s account!\nNew balance: %s\n",
+            printf("You have successfully debit %s $ from %s account!\nNew balance: %s $\n",
                 $amount, $this->getAccountNumber(), $this->balance);
             return true;
         } else {
@@ -54,7 +54,7 @@ class BankAccount
     {
         if($amount > 0) {
             $this->balance = $this->balance + $amount;
-            printf("You have successfully deposit %s $ to %s account!\nNew balance: %s\n",
+            printf("You have successfully deposit %s $ to %s account!\nNew balance: %s $\n",
                 $amount, $this->getAccountNumber(), $this->balance);
             return true;
         } else {

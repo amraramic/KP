@@ -3,7 +3,6 @@ namespace ra\kp\models;
 
 use Exception;
 use DateTime;
-use phpDocumentor\Reflection\Types\This;
 use ra\kp\exceptions\InvalidAccountTypeException;
 use ra\kp\exceptions\NoAccountException;
 use ra\kp\exceptions\NoCustomerException;
@@ -23,9 +22,6 @@ class Bank implements Banking
     /** @var Customer[] */
     private array $customers;
 
-    /** @var BankAccount[] */
-    private array $bankAccounts;
-
     /** @var SavingsAccount[] */
     private array $savingsAccounts;
 
@@ -37,7 +33,6 @@ class Bank implements Banking
         $this->accountNumberGen = 100;
         $this->customerNumberGen = 0;
         $this->customers = [];
-        $this->bankAccounts = [];
         $this->savingsAccounts = [];
         $this->checkingAccounts = [];
     }
@@ -51,16 +46,13 @@ class Bank implements Banking
      * @throws TransactionFailedException|InvalidAmountException
      */
     public function doTransaction(BankAccount $from, BankAccount $to, float $amount) : bool{
-        if ($amount > 0) {
-            $debit = $from->debit($amount);
-            if ($debit) {
-                return $to->deposit($amount);
-            }
+        if ($amount > 0 && $from->getBalance() >= $amount) {
+            $from->debit($amount);
+            $to->deposit($amount);
+            return true;
         } else {
-            throw new TransactionFailedException();
+            throw new TransactionFailedException("Make sure that the amount is greater than 0 and that there is enough money to be debited!");
         }
-
-        return false;
     }
 
     /**
@@ -69,11 +61,22 @@ class Bank implements Banking
      * @param float $amount
      * @return bool
      * @throws TransactionFailedException
+     * @throws InvalidAmountException
      */
     public function doTransactionWithAccNumber(string $from, string $to, float $amount) : bool{
-        if(key_exists($from, $this->bankAccounts) && key_exists($to, $this->bankAccounts)){
-            $fromAccount = $this->bankAccounts[$from];
-            $toAccount = $this->bankAccounts[$to];
+        $toAccount = null;
+        $fromAccount = null;
+        if(key_exists($to, $this->checkingAccounts)){
+            $toAccount = $this->checkingAccounts[$to];
+        } elseif (key_exists($to, $this->savingsAccounts)) {
+            $toAccount = $this->savingsAccounts[$to];
+        }
+        if(key_exists($from, $this->checkingAccounts)){
+            $fromAccount = $this->checkingAccounts[$from];
+        } elseif (key_exists($from, $this->savingsAccounts)) {
+            $fromAccount = $this->savingsAccounts[$from];
+        }
+        if(($from != $to) && ($fromAccount && $toAccount)){
             return $this->doTransaction($fromAccount, $toAccount, $amount);
         } else {
             throw new TransactionFailedException("The account numbers are invalid! ");
@@ -98,11 +101,11 @@ class Bank implements Banking
      * @param string $type
      * @param float $balance
      *
-     * @return null|BankAccount
-     * @throws NoCustomerException
+     * @return BankAccount
      * @throws InvalidAccountTypeException
+     * @throws NoCustomerException
      */
-    public function createNewAccount(int $customerNumber, string $type, float $balance = 0.0): ?BankAccount
+    public function createNewAccount(int $customerNumber, string $type, float $balance = 0.0): BankAccount
     {
         if(key_exists($customerNumber, $this->customers)){
             $customer = $this->customers[$customerNumber];
@@ -120,7 +123,6 @@ class Bank implements Banking
                     default:
                         throw new InvalidAccountTypeException();
                 }
-            $this->bankAccounts[$bankAccount->getAccountNumber()] = $bankAccount;
             echo "You have created a new bank account. "
                 . "Please remember the account number: " . $bankAccount->getAccountNumber();
             return $bankAccount;
@@ -136,8 +138,11 @@ class Bank implements Banking
      * @throws NoAccountException|InvalidAmountException
      */
     public function doDeposit(string $accountNumber, float $amount) : bool{
-        if (key_exists($accountNumber, $this->bankAccounts)) {
-            $bankAccount = $this->bankAccounts[$accountNumber];
+        if (key_exists($accountNumber, $this->checkingAccounts)){
+            $bankAccount = $this->checkingAccounts[$accountNumber];
+            return $bankAccount->deposit($amount);
+        } else if (key_exists($accountNumber, $this->savingsAccounts)) {
+            $bankAccount = $this->savingsAccounts[$accountNumber];
             return $bankAccount->deposit($amount);
         } else {
             throw new NoAccountException();
@@ -151,8 +156,11 @@ class Bank implements Banking
      * @throws NoAccountException|InvalidAmountException
      */
     public function doDebit(string $accountNumber, float $amount) : bool{
-        if (key_exists($accountNumber, $this->bankAccounts)) {
-            $bankAccount = $this->bankAccounts[$accountNumber];
+        if (key_exists($accountNumber, $this->checkingAccounts)){
+            $bankAccount = $this->checkingAccounts[$accountNumber];
+            return $bankAccount->debit($amount);
+        } else if (key_exists($accountNumber, $this->savingsAccounts)) {
+            $bankAccount = $this->savingsAccounts[$accountNumber];
             return $bankAccount->debit($amount);
         } else {
             throw new NoAccountException();
@@ -166,8 +174,11 @@ class Bank implements Banking
      */
     public function getBalance(string $accountNumber): float
     {
-        if (key_exists($accountNumber, $this->bankAccounts)) {
-            $bankAccount = $this->bankAccounts[$accountNumber];
+        if (key_exists($accountNumber, $this->checkingAccounts)){
+            $bankAccount = $this->checkingAccounts[$accountNumber];
+            return $bankAccount->getBalance();
+        } else if (key_exists($accountNumber, $this->savingsAccounts)) {
+            $bankAccount = $this->savingsAccounts[$accountNumber];
             return $bankAccount->getBalance();
         } else {
             throw new NoAccountException();
@@ -177,6 +188,8 @@ class Bank implements Banking
     /**
      * @param string $accountNumber
      * @return float
+     * @throws NoAccountException
+     * @throws InvalidAmountException
      */
     public function addInterest(string $accountNumber): float
     {
@@ -184,10 +197,8 @@ class Bank implements Banking
             $bankAccount = $this->savingsAccounts[$accountNumber];
             $bankAccount->addInterest();
         } else if (key_exists($accountNumber, $this->checkingAccounts)){
-            $bankAccount = $this->savingsAccounts[$accountNumber];
+            $bankAccount = $this->checkingAccounts[$accountNumber];
             $bankAccount->addInterest();
-        } else if (key_exists($accountNumber, $this->bankAccounts)){
-            throw new NoValidAccountException();
         } else {
             throw new NoAccountException();
         }
@@ -207,7 +218,7 @@ class Bank implements Banking
             } catch (InvalidAmountException $e){
                 echo $e->getDebitErrorMessage($bankAccount->getAccountMaintenanceCharge());
             }
-        } else if (key_exists($accountNumber, $this->bankAccounts) || key_exists($accountNumber, $this->savingsAccounts)){
+        } else if (key_exists($accountNumber, $this->savingsAccounts)){
             throw new NoValidAccountException();
         } else {
             throw new NoAccountException();
@@ -218,7 +229,7 @@ class Bank implements Banking
     /**
      * return string
      */
-    private function generateAccountNumber() : string{
+    public function generateAccountNumber() : string{
         $this->accountNumberGen = ++$this->accountNumberGen;
         return (string)$this->accountNumberGen;
     }
@@ -226,7 +237,7 @@ class Bank implements Banking
     /**
      * return string
      */
-    private function generateCustomerNumber() : int{
+    public function generateCustomerNumber() : int{
         $this->customerNumberGen = ++$this->customerNumberGen;
         return $this->customerNumberGen;
     }
@@ -241,11 +252,18 @@ class Bank implements Banking
     }
 
     /**
-     * @param BankAccount $bankAccount
-     * @return BankAccount $bankAccount
+     * @param CheckingAccount|SavingsAccount $bankAccount
+     * @return BankAccount
      */
-    public function addBankAccount(BankAccount $bankAccount) : BankAccount {
-        $this->bankAccounts[$bankAccount->getAccountNumber()] = $bankAccount;
+    public function addBankAccount(SavingsAccount|CheckingAccount $bankAccount) : BankAccount {
+        switch (get_class($bankAccount)){
+            case SavingsAccount::class:
+                $this->savingsAccounts[$bankAccount->getAccountNumber()] = $bankAccount;
+                break;
+            case CheckingAccount::class:
+                $this->checkingAccounts[$bankAccount->getAccountNumber()] = $bankAccount;
+                break;
+        }
         return $bankAccount;
     }
 
@@ -258,10 +276,19 @@ class Bank implements Banking
     }
 
     /**
-     * @return BankAccount[]
+     * @return SavingsAccount[]
      */
-    public function getBankAccounts(): array
+    public function getSavingsAccounts(): array
     {
-        return $this->bankAccounts;
+        return $this->savingsAccounts;
     }
+
+    /**
+     * @return CheckingAccount[]
+     */
+    public function getCheckingAccounts(): array
+    {
+        return $this->checkingAccounts;
+    }
+
 }

@@ -28,7 +28,10 @@ class BankAccountTest extends TestCase
     public function testDebit()
     {
         $this->bankAccount->debit(30);
-        self::assertEquals(70, $this->bankAccount->getBalance());
+        $this->assertEquals(70, $this->bankAccount->getBalance());
+
+        $this->expectException(InvalidAmountException::class);
+        $this->bankAccount->debit(100);
     }
 
     /**
@@ -37,6 +40,9 @@ class BankAccountTest extends TestCase
     public function testDeposit()
     {
         $this->bankAccount->deposit(50);
-        self::assertEquals(150, $this->bankAccount->getBalance());
+        $this->assertEquals(150, $this->bankAccount->getBalance());
+
+        $this->expectException(InvalidAmountException::class);
+        $this->bankAccount->deposit(0);
     }
 }

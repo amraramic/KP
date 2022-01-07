@@ -9,7 +9,9 @@ use ra\kp\exceptions\NoCustomerException;
 use ra\kp\exceptions\NoValidAccountException;
 use ra\kp\exceptions\TransactionFailedException;
 use ra\kp\models\Bank;
-use ra\kp\models\BankAccount;
+use ra\kp\models\CheckingAccount;
+use ra\kp\models\Customer;
+use ra\kp\models\SavingsAccount;
 
 class BankDemo
 {
@@ -21,10 +23,16 @@ class BankDemo
     public function startDemo()
     {
         $this->bank = new Bank();
-        $customer = $this->bank->createNewCustomer("Amra", "Ramic", "Bla", "1.1.2000");
-        $this->bank->createNewAccount($customer->getCustomerNumber(), "s", 100);
-        $customer2 = $this->bank->createNewCustomer("Emre", "Ekici", "Bla", "1.1.2000");
-        $this->bank->createNewAccount($customer2->getCustomerNumber(), "c", 50);
+        $customer1 = new Customer($this->bank->generateCustomerNumber(), "Amra", "Ramic", "Bla", new \DateTime("1.1.2000"));
+        $customer2 = new Customer($this->bank->generateCustomerNumber(),"Emre", "Ekici", "Bla", new \DateTime("1.1.2000"));
+        $this->bank->addCustomer($customer1);
+        $this->bank->addCustomer($customer2);
+        $account1 = new CheckingAccount($this->bank->generateAccountNumber(), $customer1, 100);
+        $account2 = new SavingsAccount($this->bank->generateAccountNumber(), $customer2, 50, 0.03);
+        $this->bank->addBankAccount($account1);
+        $this->bank->addBankAccount($account2);
+
+
         $this->startMenu();
     }
 
@@ -32,10 +40,10 @@ class BankDemo
      * @throws Exception
      */
     function startMenu(){
-        echo("\nCreate customer = CUST, Create account = ACC, Do transaction = TRANS, Deposit = DEP, Debit = DEB, See balance = BAL, Add interest = INTER, Deduct Account Maintenance Charge = MAINT, Overview = ALL\n"
+        echo("\nCreate customer = CUST, Create account = ACC, Do transaction = TRANS, Deposit = DEP, Debit = DEB,\n" .
+            "See balance = BAL, Add interest = INTER, Deduct Account Maintenance Charge = MAINT, Overview = ALL\n\n"
             . "What do you want to do? Type a key word: ");
         $command = readline("What do you want wo do? Type key word: ");
-
         switch ($command){
             case "CUST":
             case "cust":
@@ -100,7 +108,7 @@ class BankDemo
         $lastname = readline();
         echo "Address: ";
         $address = readline();
-        echo "Birthday ";
+        echo "Birthday: ";
         $birthday = readline();
         try {
             $this->bank->createNewCustomer($firstname, $lastname, $address, $birthday);
@@ -137,6 +145,8 @@ class BankDemo
             $this->bank->doTransactionWithAccNumber($from, $to, $amount);
         } catch (TransactionFailedException $e) {
             echo $e->getErrorMessage();
+            echo $e->getMessage();
+        } catch (InvalidAmountException $e) {
         }
     }
 
@@ -176,7 +186,7 @@ class BankDemo
         $account = readline();
         try {
             $balance = $this->bank->getBalance($account);
-            echo "Balance of " . $account .": " . $balance ."\n";
+            echo "Balance of " . $account .": " . $balance ." $\n";
         } catch (NoAccountException $e) {
             echo $e->getErrorMessage();
         }
@@ -201,17 +211,23 @@ class BankDemo
         try {
             echo "Balance after deducting account maintenance charge: " . $this->bank->deductMaintenanceCharge($account) ."\n";
         } catch (NoValidAccountException $e){
-            echo $e->getErrorMessage();
+            echo $e->getCheckingAccountErrorMessage();
         } catch (NoAccountException $e){
             echo $e->getErrorMessage();
         }
     }
 
     function showAll(){
-        $bankAccounts = $this->bank->getBankAccounts();
-        print_r("AccNr | CustNr | Firstname | Lastname | Balance\n");
-        foreach ($bankAccounts as $account){
-            print_r($account->getAccountNumber()."   |   ".$account->getCustomer()->getCustomerNumber()."    |    "
+        $savingsAccounts = $this->bank->getSavingsAccounts();
+        $checkingAccounts = $this->bank->getCheckingAccounts();
+        print_r("AccNr |      AccType       | CustNr | Firstname | Lastname | Balance\n");
+        foreach ($savingsAccounts as $account){
+            print_r($account->getAccountNumber()."   |   SavingsAccount   |   ".$account->getCustomer()->getCustomerNumber()."    |    "
+                .$account->getCustomer()->getFirstName()."   |   ".$account->getCustomer()->getLastName()."  |  ".
+                $account->getBalance()."\n");
+        }
+        foreach ($checkingAccounts as $account){
+            print_r($account->getAccountNumber()."   |   CheckingAccount  |   ".$account->getCustomer()->getCustomerNumber()."    |    "
                 .$account->getCustomer()->getFirstName()."   |   ".$account->getCustomer()->getLastName()."  |  ".
                 $account->getBalance()."\n");
         }

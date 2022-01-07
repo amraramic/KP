@@ -11,7 +11,7 @@ class NoValidAccountExceptionTest extends TestCase
     {
         $exception = new NoValidAccountException();
 
-        $this->assertEquals("The account has to be a saving or a checking account!\n", $exception->getErrorMessage());
+        $this->assertEquals("\nThe account has to be a saving or a checking account!\n", $exception->getErrorMessage());
 
         $this->expectException(NoValidAccountException::class);
         throw $exception;
