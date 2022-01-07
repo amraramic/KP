@@ -1,0 +1,27 @@
+= Compare Object Oriented Programming Go with PHP
+
+Table of contents:
+
+. Introduction and motivation
+. Basics
+.. Object-oriented programming
+.. PHP
+.. Go
+. Principles of Object Oriented Programing in Go and PHP
+.. Abstraction
+.. Inheritance
+.. Polymorphism
+.. Encapsulation
+. Concepts of Object Oriented Programing in Go and PHP
+.. Classes and objects
+.. Interfaces
+.. Constructor
+.. Deconstructor
+.. Overloading
+
+<<<
+
+. Introduction and motivation
+
+
+

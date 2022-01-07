@@ -1,10 +1,13 @@
 <?php
 namespace ra\kp\models;
 
+use ra\kp\exceptions\InvalidAmountException;
+
 class SavingsAccount extends BankAccount
 {
     /** @var float */
     private float $interestRate;
+
 
     /**
      * @param string $accountNumber
@@ -18,6 +21,9 @@ class SavingsAccount extends BankAccount
         $this->interestRate = $interestRate;
     }
 
+    /**
+     * @throws InvalidAmountException
+     */
     public function addInterest(){
         $interest = $this->getBalance() * $this->interestRate / 100;
         $this->deposit($interest);

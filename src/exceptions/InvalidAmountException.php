@@ -6,21 +6,22 @@ class InvalidAmountException extends \Exception
 {
     /**
      * @param float $amount
-     * @param float $balance
+     * @return string
      */
-    public function getDebitErrorMessage(float $amount, float $balance): string
+    public function getDebitErrorMessage(float $amount): string
     {
-        return "Unfortunately, your account balance (".$balance." $) isn't sufficient to make the debit (".$amount." $)"
-            . "\nPlease make sure that you have enough money on your account!";
+        return "Unfortunately, the account balance isn't sufficient to make the debit of "."$amount"." $)"
+            . "\nPlease make sure that there is enough money on this account!\n";
     }
 
     /**
      * @param float $amount
+     * @return string
      */
     public function getDepositErrorMessage(float $amount): string
     {
-        return "You are trying to deposit an invalid amount (" . $amount . " $) of money to your account."
-            . "\nPlease make sure that the amount is greater then zero!";
+        return "You are trying to deposit an invalid amount (" . $amount . " $) of money to this account."
+            . "\nPlease make sure that the amount is greater then zero!\n";
     }
 
 

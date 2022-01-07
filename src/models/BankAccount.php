@@ -31,44 +31,35 @@ class BankAccount
     /**
      * @param float $amount
      * @return bool
+     * @throws InvalidAmountException
      */
     public function debit(float $amount) : bool
     {
-        try{
-            if($amount < $this->balance){
-                $this->balance = $this->balance - $amount;
-                printf("You have successfully debit %s $ to %s account!\nNew balance: %s\n",
-                    $amount, $this->getAccountNumber(), $this->balance);
-                return true;
-            } else {
-                throw new InvalidAmountException();
-            }
-        } catch (InvalidAmountException $e){
-            echo $e->getDebitErrorMessage($amount, $this->balance);
+        if($amount < $this->balance){
+            $this->balance = $this->balance - $amount;
+            printf("You have successfully debit %s $ to %s account!\nNew balance: %s\n",
+                $amount, $this->getAccountNumber(), $this->balance);
+            return true;
+        } else {
+            throw new InvalidAmountException();
         }
-        return false;
     }
 
     /**
      * @param float $amount
      * @return bool
+     * @throws InvalidAmountException
      */
     public function deposit(float $amount) : bool
     {
-        try {
-            if($amount > 0) {
-                $this->balance = $this->balance + $amount;
-                printf("You have successfully deposit %s $ to %s account!\nNew balance: %s\n",
-                    $amount, $this->getAccountNumber(), $this->balance);
-                return true;
-            } else {
-                throw new InvalidAmountException();
-            }
-        } catch (InvalidAmountException $e){
-            echo $e->getDepositErrorMessage($amount);
+        if($amount > 0) {
+            $this->balance = $this->balance + $amount;
+            printf("You have successfully deposit %s $ to %s account!\nNew balance: %s\n",
+                $amount, $this->getAccountNumber(), $this->balance);
+            return true;
+        } else {
+            throw new InvalidAmountException();
         }
-
-        return false;
     }
 
     /**

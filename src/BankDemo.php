@@ -2,7 +2,14 @@
 namespace ra\kp;
 
 use Exception;
+use ra\kp\exceptions\InvalidAccountTypeException;
+use ra\kp\exceptions\InvalidAmountException;
+use ra\kp\exceptions\NoAccountException;
+use ra\kp\exceptions\NoCustomerException;
+use ra\kp\exceptions\NoValidAccountException;
+use ra\kp\exceptions\TransactionFailedException;
 use ra\kp\models\Bank;
+use ra\kp\models\BankAccount;
 
 class BankDemo
 {
@@ -16,9 +23,8 @@ class BankDemo
         $this->bank = new Bank();
         $customer = $this->bank->createNewCustomer("Amra", "Ramic", "Bla", "1.1.2000");
         $this->bank->createNewAccount($customer->getCustomerNumber(), "s", 100);
-        $customer2 = $this->bank->createNewCustomer("EMre", "Ekici", "Bla", "1.1.2000");
+        $customer2 = $this->bank->createNewCustomer("Emre", "Ekici", "Bla", "1.1.2000");
         $this->bank->createNewAccount($customer2->getCustomerNumber(), "c", 50);
-        //$this->bank->createNewAccount("Emre", "Ekici", "Bla", "1.1.2000", 100);
         $this->startMenu();
     }
 
@@ -26,7 +32,7 @@ class BankDemo
      * @throws Exception
      */
     function startMenu(){
-        echo("\nCreate customer = CUST, Create account = ACC, Do transaction = TRANS, Deposit = DEP, Debit = DEB, See balance = BAL, Add interest = INTER, Overview = ALL\n"
+        echo("\nCreate customer = CUST, Create account = ACC, Do transaction = TRANS, Deposit = DEP, Debit = DEB, See balance = BAL, Add interest = INTER, Deduct Account Maintenance Charge = MAINT, Overview = ALL\n"
             . "What do you want to do? Type a key word: ");
         $command = readline("What do you want wo do? Type key word: ");
 
@@ -66,6 +72,11 @@ class BankDemo
                 $this->addInterest();
                 $this->startMenu();
                 break;
+            case "maint":
+            case "MAINT":
+                $this->deductMaintenanceCharge();
+                $this->startMenu();
+                break;
             case "ALL":
             case "all":
                 $this->showAll();
@@ -91,24 +102,28 @@ class BankDemo
         $address = readline();
         echo "Birthday ";
         $birthday = readline();
-        $this->bank->createNewCustomer($firstname, $lastname, $address, $birthday);
+        try {
+            $this->bank->createNewCustomer($firstname, $lastname, $address, $birthday);
+        } catch (Exception $e){
+            echo $e->getMessage();
+        }
     }
 
-    /**
-     * @throws Exception
-     */
     function createAccount(){
         echo "Please enter your data:\n";
+        echo "Customer number: ";
+        $customerNumber = (int) readline();
         echo "Typ of account: (S = Savings/C = Checking): ";
         $type = readline();
-        echo "Customer number: ";
-        $customerNumber = readline();
-        $this->bank->createNewAccount($customerNumber, $type);
+        try {
+            $this->bank->createNewAccount($customerNumber, $type);
+        } catch (NoCustomerException $e){
+            echo $e->getErrorMessage();
+        } catch (InvalidAccountTypeException $e){
+            echo $e->getErrorMessage();
+        }
     }
 
-    /**
-     * @throws Exception
-     */
     function doTransaction(){
         echo "Please enter the data:\n";
         echo "From: ";
@@ -116,9 +131,13 @@ class BankDemo
         echo "To: ";
         $to = readline();
         echo "Amount: ";
-        $amount = readline();
+        $amount = (float) readline();
 
-        $this->bank->doTransactionWithAccNumber($from, $to, $amount);
+        try {
+            $this->bank->doTransactionWithAccNumber($from, $to, $amount);
+        } catch (TransactionFailedException $e) {
+            echo $e->getErrorMessage();
+        }
     }
 
     function deposit(){
@@ -126,8 +145,14 @@ class BankDemo
         echo "Account number: ";
         $account = readline();
         echo "Amount: ";
-        $amount = readline();
-        $this->bank->doDeposit($account, $amount);
+        $amount = (float) readline();
+        try{
+            $this->bank->doDeposit($account, $amount);
+        } catch (InvalidAmountException $e){
+            echo $e->getDepositErrorMessage($amount);
+        } catch (NoAccountException $e){
+            echo $e->getErrorMessage();
+        }
     }
 
     function debit(){
@@ -135,29 +160,60 @@ class BankDemo
         echo "Account number: ";
         $account = readline();
         echo "Amount: ";
-        $amount = readline();
-        $this->bank->doDebit($account, $amount);
+        $amount = (float) readline();
+        try{
+            $this->bank->doDebit($account, $amount);
+        } catch (InvalidAmountException $e){
+            echo $e->getDebitErrorMessage($amount);
+        } catch (NoAccountException $e){
+            echo $e->getErrorMessage();
+        }
     }
 
     function showBalance(){
         echo "Please enter the data:\n";
         echo "Account number: ";
         $account = readline();
-        echo "Balance of " . $account .": " . $this->bank->getBalance($account) ."\n";
+        try {
+            $balance = $this->bank->getBalance($account);
+            echo "Balance of " . $account .": " . $balance ."\n";
+        } catch (NoAccountException $e) {
+            echo $e->getErrorMessage();
+        }
     }
 
     function addInterest(){
         echo "Please enter the data:\n";
         echo "Account number: ";
         $account = readline();
-        echo "Balance after adding interest: " . $this->bank->addInterest($account) ."\n";
+        try {
+            echo "Balance after adding interest: " . $this->bank->addInterest($account) ."\n";
+        } catch (NoValidAccountException $e){
+            echo $e->getErrorMessage();
+        } catch (NoAccountException $e){
+            echo $e->getErrorMessage();
+        }
+    }
+
+    function deductMaintenanceCharge() {
+        echo "Account number: ";
+        $account = readline();
+        try {
+            echo "Balance after deducting account maintenance charge: " . $this->bank->deductMaintenanceCharge($account) ."\n";
+        } catch (NoValidAccountException $e){
+            echo $e->getErrorMessage();
+        } catch (NoAccountException $e){
+            echo $e->getErrorMessage();
+        }
     }
 
     function showAll(){
         $bankAccounts = $this->bank->getBankAccounts();
-        print_r("AccNr | CustNr | Balance\n");
+        print_r("AccNr | CustNr | Firstname | Lastname | Balance\n");
         foreach ($bankAccounts as $account){
-            print_r($account->getAccountNumber()."  |   ".$account->getCustomer()->getCustomerNumber()."    |    ".$account->getBalance()."\n");
+            print_r($account->getAccountNumber()."   |   ".$account->getCustomer()->getCustomerNumber()."    |    "
+                .$account->getCustomer()->getFirstName()."   |   ".$account->getCustomer()->getLastName()."  |  ".
+                $account->getBalance()."\n");
         }
     }
 }

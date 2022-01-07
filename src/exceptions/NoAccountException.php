@@ -2,7 +2,9 @@
 
 namespace ra\kp\exceptions;
 
-class NoAccountException extends \Exception
+use Exception;
+
+class NoAccountException extends Exception
 {
     public function getErrorMessage(): string
     {
