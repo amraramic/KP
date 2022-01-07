@@ -36,34 +36,10 @@ class CheckingAccount extends BankAccount
     }
 
     /**
-     * @return float
-     */
-    public function getInterestRate(): float
-    {
-        return $this->interestRate;
-    }
-
-    /**
      * @param float $interestRate
      */
     public function setInterestRate(float $interestRate): void
     {
         $this->interestRate = $interestRate;
-    }
-
-    /**
-     * @return float
-     */
-    public function getAccountMaintenanceCharge(): float
-    {
-        return $this->accountMaintenanceCharge;
-    }
-
-    /**
-     * @param float $accountMaintenanceCharge
-     */
-    public function setAccountMaintenanceCharge(float $accountMaintenanceCharge): void
-    {
-        $this->accountMaintenanceCharge = $accountMaintenanceCharge;
     }
 }

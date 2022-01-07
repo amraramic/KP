@@ -4,9 +4,9 @@ use ra\kp\exceptions\InvalidAccountTypeException;
 use ra\kp\exceptions\NoAccountException;
 use ra\kp\exceptions\InvalidAmountException;
 use ra\kp\exceptions\NoCustomerException;
+use ra\kp\exceptions\NoValidAccountException;
 use ra\kp\exceptions\TransactionFailedException;
 use ra\kp\models\Bank;
-use ra\kp\models\BankAccount;
 use ra\kp\models\CheckingAccount;
 use ra\kp\models\Customer;
 use PHPUnit\Framework\TestCase;
@@ -24,59 +24,42 @@ class BankTest extends TestCase
     {
         $this->bank = new Bank();
         $this->cust1 = new Customer(
-            "1",
+            1,
             "Max",
-            "Mustermann",
-            "Straße 1, 80000 Stadt",
-            new \DateTime("01.01.1980")
+            "Mustermann"
         );
 
         $this->cust2 = new Customer(
-            "2",
+            2,
             "Marie",
-            "Meier",
-            "Straße 2, 80000 Stadt",
-            new \DateTime("12.12.1990")
+            "Meier"
         );
 
-        $this->bankAccount1 = new CheckingAccount($this->bank->generateAccountNumber(), $this->cust1, 100);
-        $this->bankAccount2 = new SavingsAccount($this->bank->generateAccountNumber(), $this->cust2, 200);
+        $this->bankAccount1 = new CheckingAccount("101", $this->cust1, 100);
+        $this->bankAccount2 = new SavingsAccount("102", $this->cust2, 200);
     }
 
     public function testCreateNewCustomer()
     {
-        $this->expectException(Exception::class);
-        $this->bank->createNewCustomer(
-            "Max",
-            "Mustermann",
-            "Straße 1, 80000 Stadt",
-            "test");
-
         $customer = $this->bank->createNewCustomer(
             "Max",
-            "Mustermann",
-            "Straße 1, 80000 Stadt",
-            "01.01.2000");
+            "Mustermann"
+        );
         $this->assertEquals($this->cust1, $customer);
         $this->expectOutputString("You have created a new customer.Please remember the customer number: 1");
         $this->assertCount(1, $this->bank->getCustomers());
     }
 
-    /**
-     * @throws Exception
-     */
     public function testGetCustomers()
     {
         $customer1 = $this->bank->createNewCustomer(
             "Max",
-            "Mustermann",
-            "Straße 1, 80000 Stadt",
-            "01.01.1980");
+            "Mustermann"
+        );
         $this->bank->createNewCustomer(
             "Marie",
-            "Meier",
-            "Straße 2, 90000 Stadt",
-            "12.12.1960");
+            "Meier"
+        );
 
         $customers = $this->bank->getCustomers();
         $this->assertCount(2, $customers);
@@ -184,15 +167,14 @@ class BankTest extends TestCase
     public function testCreateNewAccount()
     {
         $this->bank->addCustomer($this->cust1);
-        $expect = new CheckingAccount("105", $this->cust1, 100);
         $bankAccount = $this->bank->createNewAccount(
             $this->cust1->getCustomerNumber(),
             "c",
             100.0
         );
 
-        $this->assertEquals($expect, $bankAccount);
-        $this->expectOutputString("You have created a new bank account. Please remember the account number: 105");
+        $this->assertEquals($this->bankAccount1, $bankAccount);
+        $this->expectOutputString("You have created a new bank account. Please remember the account number: 101");
         $this->assertCount(1, $this->bank->getCheckingAccounts());
 
         $this->expectException(NoCustomerException::class);
@@ -204,5 +186,81 @@ class BankTest extends TestCase
             "d",
             100.0
         );
+    }
+
+    public function testAddCustomer()
+    {
+        $this->assertCount(0,$this->bank->getCustomers());
+        $this->bank->addCustomer($this->cust1);
+        $this->assertCount(1, $this->bank->getCustomers());
+    }
+
+    public function testAddBankAccount()
+    {
+        $this->assertCount(0,$this->bank->getCheckingAccounts());
+        $this->bank->addBankAccount($this->bankAccount1);
+        $this->assertCount(1, $this->bank->getCheckingAccounts());
+
+        $this->assertCount(0,$this->bank->getSavingsAccounts());
+        $this->bank->addBankAccount($this->bankAccount2);
+        $this->assertCount(1, $this->bank->getSavingsAccounts());
+    }
+
+    /**
+     * @throws NoCustomerException
+     */
+    public function testDeleteCustomer(){
+        $this->bank->addCustomer($this->cust1);
+        $this->assertArrayHasKey(1, $this->bank->getCustomers());
+        $this->bank->deleteCustomer(1);
+        $this->assertArrayNotHasKey(1, $this->bank->getCustomers());
+
+        $this->expectException(NoCustomerException::class);
+        $this->bank->deleteCustomer(10);
+    }
+
+    /**
+     * @throws NoAccountException
+     */
+    public function testDeleteAccount(){
+        $this->bank->addBankAccount($this->bankAccount1);
+        $this->assertArrayHasKey("101", $this->bank->getCheckingAccounts());
+        $this->bank->deleteAccount("101");
+        $this->assertArrayNotHasKey("101", $this->bank->getCustomers());
+
+        $this->expectException(NoAccountException::class);
+        $this->bank->deleteAccount("200");
+    }
+
+    /**
+     * @throws InvalidAmountException
+     * @throws NoAccountException
+     */
+    public function testAddInterest()
+    {
+        $this->bank->addBankAccount($this->bankAccount1);
+        $this->expectException(NoAccountException::class);
+        $this->bank->addInterest("105");
+    }
+
+    /**
+     * @throws NoAccountException
+     */
+    public function testDeductMaintenanceCharge(){
+        $this->bank->addBankAccount($this->bankAccount2);
+
+        $this->expectException(NoValidAccountException::class);
+        $this->bank->deductMaintenanceCharge("102");
+
+        $this->expectException(NoAccountException::class);
+        $this->bank->deductMaintenanceCharge("103");
+    }
+
+    public function testGenerateAccountNumber(){
+        $this->assertEquals("101", $this->bank->generateAccountNumber());
+    }
+
+    public function testGenerateCustomerNumber(){
+        $this->assertEquals("1", $this->bank->generateCustomerNumber());
     }
 }

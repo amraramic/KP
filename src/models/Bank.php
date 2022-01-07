@@ -2,7 +2,6 @@
 namespace ra\kp\models;
 
 use Exception;
-use DateTime;
 use ra\kp\exceptions\InvalidAccountTypeException;
 use ra\kp\exceptions\NoAccountException;
 use ra\kp\exceptions\NoCustomerException;
@@ -83,13 +82,9 @@ class Bank implements Banking
         }
     }
 
-    /**
-     * @throws Exception
-     */
-    function createNewCustomer(string $firstName, string $lastName, string $address, string $birthday): ?Customer
+    function createNewCustomer(string $firstName, string $lastName): ?Customer
     {
-        $birthday = new DateTime($birthday);
-        $customer = new Customer($this->generateCustomerNumber(), $firstName, $lastName, $address, $birthday);
+        $customer = new Customer($this->generateCustomerNumber(), $firstName, $lastName);
         $this->customers[$customer->getCustomerNumber()] = $customer;
         echo "You have created a new customer."
             . "Please remember the customer number: " . $customer->getCustomerNumber();
@@ -252,6 +247,18 @@ class Bank implements Banking
     }
 
     /**
+     * @param int $customerNumber
+     * @throws NoCustomerException
+     */
+    public function deleteCustomer(int $customerNumber) : void{
+        if(key_exists($customerNumber, $this->customers)) {
+            unset($this->customers[$customerNumber]);
+        } else {
+            throw new NoCustomerException();
+        }
+    }
+
+    /**
      * @param CheckingAccount|SavingsAccount $bankAccount
      * @return BankAccount
      */
@@ -265,6 +272,20 @@ class Bank implements Banking
                 break;
         }
         return $bankAccount;
+    }
+
+    /**
+     * @param string $accountNumber
+     * @throws NoAccountException
+     */
+    public function deleteAccount(string $accountNumber) : void{
+        if(key_exists($accountNumber, $this->checkingAccounts)) {
+            unset($this->checkingAccounts[$accountNumber]);
+        } elseif (key_exists($accountNumber, $this->savingsAccounts)){
+            unset($this->savingsAccounts[$accountNumber]);
+        } else {
+            throw new NoAccountException();
+        }
     }
 
     /**

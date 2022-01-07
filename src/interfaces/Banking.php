@@ -39,11 +39,9 @@ interface Banking
     /**
      * @param string $firstName
      * @param string $lastName
-     * @param string $address
-     * @param string $birthday
      * @return Customer|null
      */
-    function createNewCustomer(string $firstName, string $lastName, string $address, string $birthday) : ?Customer;
+    function createNewCustomer(string $firstName, string $lastName) : ?Customer;
 
     /**
      * @param string $accountNumber
@@ -64,4 +62,25 @@ interface Banking
      * @return float
      */
     function getBalance(string $accountNumber) : float;
+
+    /**
+     * @param SavingsAccount|CheckingAccount $bankAccount
+     * @return BankAccount
+     */
+    function addBankAccount(SavingsAccount|CheckingAccount $bankAccount) : BankAccount;
+
+    /**
+     * @param Customer $customer
+     * @return Customer
+     */
+    function addCustomer(Customer $customer) : Customer;
+    /**
+     * @param int $customerNumber
+     */
+    function deleteCustomer(int $customerNumber) : void;
+
+    /**
+     * @param string $accountNumber
+     */
+    function deleteAccount(string $accountNumber) : void;
 }
