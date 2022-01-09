@@ -8,7 +8,6 @@ class SavingsAccount extends BankAccount
     /** @var float */
     private float $interestRate;
 
-
     /**
      * @param string $accountNumber
      * @param Customer $customer
@@ -19,6 +18,19 @@ class SavingsAccount extends BankAccount
     {
         parent::__construct($accountNumber, $customer, $balance);
         $this->interestRate = $interestRate;
+    }
+
+    /**
+     * @return string
+     */
+    public function showInfos(): string
+    {
+        return $this->getAccountNumber()."   |   Savings account  |   ".
+            $this->getCustomer()->getCustomerNumber()."    |    " .
+            $this->getCustomer()->getFirstName()."   |   ".
+            $this->getCustomer()->getLastName()."  |  ".
+            $this->getBalance()."     |    ".
+            $this->getInterestRate()."\n";
     }
 
     /**

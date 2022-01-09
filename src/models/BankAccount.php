@@ -4,13 +4,13 @@ namespace ra\kp\models;
 
 use ra\kp\exceptions\InvalidAmountException;
 
-class BankAccount
+abstract class BankAccount
 {
     /** @var string */
-    private string $accountNumber;
+    public string $accountNumber;
 
     /** @var Customer */
-    private Customer $customer;
+    protected Customer $customer;
 
     /** @var float */
     private float $balance;
@@ -27,6 +27,10 @@ class BankAccount
         $this->balance = $balance;
     }
 
+    /**
+     * @return string
+     */
+    public abstract function showInfos() : string;
 
     /**
      * @param float $amount
@@ -35,7 +39,7 @@ class BankAccount
      */
     public function debit(float $amount) : bool
     {
-        if($amount < $this->balance){
+        if($amount < $this->balance && $amount > 0){
             $this->balance = $this->balance - $amount;
             printf("You have successfully debit %s $ from %s account!\nNew balance: %s $\n",
                 $amount, $this->getAccountNumber(), $this->balance);
@@ -52,7 +56,7 @@ class BankAccount
      */
     public function deposit(float $amount) : bool
     {
-        if($amount > 0) {
+        if($amount > 0 && $amount < 100000) {
             $this->balance = $this->balance + $amount;
             printf("You have successfully deposit %s $ to %s account!\nNew balance: %s $\n",
                 $amount, $this->getAccountNumber(), $this->balance);
@@ -71,27 +75,11 @@ class BankAccount
     }
 
     /**
-     * @param string $accountNumber
-     */
-    public function setAccountNumber(string $accountNumber): void
-    {
-        $this->accountNumber = $accountNumber;
-    }
-
-    /**
      * @return Customer
      */
     public function getCustomer(): Customer
     {
         return $this->customer;
-    }
-
-    /**
-     * @param Customer $customer
-     */
-    public function setCustomer(Customer $customer): void
-    {
-        $this->customer = $customer;
     }
 
     /**

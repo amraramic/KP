@@ -46,7 +46,7 @@ class BankTest extends TestCase
             "Mustermann"
         );
         $this->assertEquals($this->cust1, $customer);
-        $this->expectOutputString("You have created a new customer.Please remember the customer number: 1");
+        $this->expectOutputString("You have created a new customer.Please remember the customer number: 1\n");
         $this->assertCount(1, $this->bank->getCustomers());
     }
 
@@ -68,7 +68,6 @@ class BankTest extends TestCase
     }
 
     /**
-     * @throws NoAccountException
      * @throws InvalidAmountException
      */
     public function testDoDebit()
@@ -78,9 +77,6 @@ class BankTest extends TestCase
 
         $this->assertEquals(150.0, $this->bank->doDebit("101", 50.0));
         $this->expectOutputString("You have successfully debit 50 $ from 101 account!\nNew balance: 50 $\n");
-
-        $this->expectException(NoAccountException::class);
-        $this->bank->doDebit("200", 100);
     }
 
     /**
@@ -106,24 +102,16 @@ class BankTest extends TestCase
         $this->assertTrue($this->bank->doTransactionWithAccNumber("101", "200", 20.0));
     }
 
-    /**
-     * @throws NoAccountException
-     */
     public function testGetBalance()
     {
         $this->bank->addCustomer($this->cust1);
         $this->bank->addBankAccount($this->bankAccount1);
         $accNumber = $this->bankAccount1->getAccountNumber();
         $this->assertEquals(100.0, $this->bank->getBalance($accNumber));
-
-        $this->expectException(NoAccountException::class);
-        $this->bank->getBalance("300");
-
     }
 
     /**
      * @throws InvalidAmountException
-     * @throws NoAccountException
      */
     public function testDoDeposit()
     {
@@ -132,9 +120,6 @@ class BankTest extends TestCase
 
         $this->assertEquals(250.0, $this->bank->doDeposit("101", 50.0));
         $this->expectOutputString("You have successfully deposit 50 $ to 101 account!\nNew balance: 150 $\n");
-
-        $this->expectException(NoAccountException::class);
-        $this->bank->doDeposit("200", 100);
     }
 
     /**
@@ -162,7 +147,7 @@ class BankTest extends TestCase
     }
 
     /**
-     * @throws NoCustomerException|InvalidAccountTypeException
+     * @throws InvalidAccountTypeException
      */
     public function testCreateNewAccount()
     {
@@ -174,11 +159,8 @@ class BankTest extends TestCase
         );
 
         $this->assertEquals($this->bankAccount1, $bankAccount);
-        $this->expectOutputString("You have created a new bank account. Please remember the account number: 101");
+        $this->expectOutputString("You have created a new bank account. Please remember the account number: 101\n");
         $this->assertCount(1, $this->bank->getCheckingAccounts());
-
-        $this->expectException(NoCustomerException::class);
-        $this->bank->createNewAccount(5, "", 100.0);
 
         $this->expectException(InvalidAccountTypeException::class);
         $this->bank->createNewAccount(
@@ -206,54 +188,44 @@ class BankTest extends TestCase
         $this->assertCount(1, $this->bank->getSavingsAccounts());
     }
 
-    /**
-     * @throws NoCustomerException
-     */
     public function testDeleteCustomer(){
         $this->bank->addCustomer($this->cust1);
+        $this->bank->addBankAccount($this->bankAccount1);
         $this->assertArrayHasKey(1, $this->bank->getCustomers());
+        $this->assertArrayHasKey("101", $this->bank->getCheckingAccounts());
         $this->bank->deleteCustomer(1);
+        $this->assertArrayNotHasKey("101", $this->bank->getCheckingAccounts());
         $this->assertArrayNotHasKey(1, $this->bank->getCustomers());
-
-        $this->expectException(NoCustomerException::class);
-        $this->bank->deleteCustomer(10);
     }
 
-    /**
-     * @throws NoAccountException
-     */
     public function testDeleteAccount(){
         $this->bank->addBankAccount($this->bankAccount1);
         $this->assertArrayHasKey("101", $this->bank->getCheckingAccounts());
         $this->bank->deleteAccount("101");
         $this->assertArrayNotHasKey("101", $this->bank->getCustomers());
-
-        $this->expectException(NoAccountException::class);
-        $this->bank->deleteAccount("200");
     }
 
     /**
      * @throws InvalidAmountException
-     * @throws NoAccountException
      */
     public function testAddInterest()
     {
         $this->bank->addBankAccount($this->bankAccount1);
-        $this->expectException(NoAccountException::class);
-        $this->bank->addInterest("105");
+        $this->bankAccount1->setInterestRate(0.0);
+        $this->expectException(InvalidAmountException::class);
+        $this->bankAccount1->addInterest();
+
+        $this->bankAccount1->setInterestRate(0.05);
+        $this->bankAccount1->addInterest();
+        $this->assertEquals(100.5, $this->bankAccount1->getBalance());
     }
 
-    /**
-     * @throws NoAccountException
-     */
+
     public function testDeductMaintenanceCharge(){
         $this->bank->addBankAccount($this->bankAccount2);
 
         $this->expectException(NoValidAccountException::class);
         $this->bank->deductMaintenanceCharge("102");
-
-        $this->expectException(NoAccountException::class);
-        $this->bank->deductMaintenanceCharge("103");
     }
 
     public function testGenerateAccountNumber(){
@@ -262,5 +234,44 @@ class BankTest extends TestCase
 
     public function testGenerateCustomerNumber(){
         $this->assertEquals("1", $this->bank->generateCustomerNumber());
+    }
+
+    /**
+     * @throws NoCustomerException
+     */
+    public function testCheckCustomerNumber(){
+        $this->bank->addCustomer($this->cust1);
+
+        $this->assertTrue($this->bank->checkCustomerNumber(1));
+        $this->expectException(NoCustomerException::class);
+        $this->bank->checkCustomerNumber(2);
+
+    }
+
+    /**
+     * @throws NoAccountException
+     */
+    public function testCheckAccountNumber(){
+        $this->bank->addBankAccount($this->bankAccount1);
+
+        $this->assertTrue($this->bank->checkAccountNumber("101"));
+        $this->expectException(NoAccountException::class);
+        $this->bank->checkAccountNumber("100");
+    }
+
+    public function testGetCheckingAccounts(){
+        $expected = ["101" => $this->bankAccount1];
+
+        $this->assertEmpty($this->bank->getCheckingAccounts());
+        $this->bank->addBankAccount($this->bankAccount1);
+        $this->assertEquals($expected, $this->bank->getCheckingAccounts());
+    }
+
+    public function testGetSavingAccounts(){
+        $expected = ["102" => $this->bankAccount2];
+
+        $this->assertEmpty($this->bank->getSavingsAccounts());
+        $this->bank->addBankAccount($this->bankAccount2);
+        $this->assertEquals($expected, $this->bank->getSavingsAccounts());
     }
 }
