@@ -81,7 +81,7 @@ class Bank implements Banking
         }
     }
 
-    function createNewCustomer(string $firstName, string $lastName): ?Customer
+    function createNewCustomer(string $firstName, string $lastName): Customer
     {
         $customer = new Customer($this->generateCustomerNumber(), $firstName, $lastName);
         $this->customers[$customer->getCustomerNumber()] = $customer;

@@ -4,13 +4,7 @@ Amra Ramic <amra.ramic@stud.th-rosenheim.de>
 :sectnums:
 
 == Introduction to semester thesis
-In the context of this work, the aspects of object-oriented programming for programming languages PHP and Go are compared.
-For the sake of comprehensibility, the necessary terms are clarified at the beginning of the work.
-To better understand the differences and similarities between these languages, a small code project was
-created for this purpose. It is a banking system that is used by bank employees to perform common banking activities
-such as withdrawing or depositing money or carrying out transactions.
-Only individual code snippets are used during the comparison. The entire code project can be accessed at the
-following https://github.com/amraramic/KP[link].
+In the context of this work, the aspects of object-oriented programming for programming languages PHP and Go are compared. For the sake of comprehensibility, the necessary terms are clarified at the beginning of the work. To better understand the differences and similarities between these languages, a small code project was created for this purpose. It is a banking system that is used by bank employees to perform common banking activities such as withdrawing or depositing money or carrying out transactions. Only individual code snippets are used during the comparison. The entire code project can be accessed at the following https://github.com/amraramic/KP[link].
 
 == Explanation of terms
 This section introduces the languages to be compared, followed by a description of the main features of object-oriented
@@ -35,35 +29,28 @@ generally work without modification on the others <<Donovan>>.
 === PHP
 PHP (recursive acronym of PHP: Hypertext Preprocessor) is a widely used open-source general-purpose scripting language
 that is specifically suited for web programming and can be embedded in HTML. PHP differs from client-side languages such
-as Javascript in that the code is executed on the server, where it generates HTML output that is then sent to the client.
-So the client only gets the result of the execution of the script, with no way of knowing what the actual code looks like.
-The best thing about using PHP is that it is easy for beginners, but it also offers an enormous range of features for
-professional programmers. Even though PHP development is focused on server-side programming, it is possible to do much
-more with PHP. here are three main areas in which PHP scripts are used:
+as Javascript in that the code is executed on the server, where it generates HTML output that is then sent to the client. So the client only gets the result of the execution of the script, with no way of knowing what the actual code looks like. The best thing about using PHP is that it is easy for beginners, but it also offers an enormous range of features for professional programmers. Even though PHP development is focused on server-side programming, it is possible to do much more with PHP. Here are three main areas in which PHP scripts are used:
 
 - Server-side programming: This is the traditional and also main field of PHP. With the help of the PHP parser, a web server
 and a web browser, all web applications can be developed.
-- Command line programming: It is also possible to write PHP scripts that can work without a server or browser.
-Only the PHP parser is needed and different programs can be developed and executed.
+- Command line programming: It is also possible to write PHP scripts that can work without a server or browser. Only the PHP parser is needed and different programs can be developed and executed.
 - Writing desktop applications: PHP is probably not the very best language to write desktop applications with graphical interface,
-but with a lot of experience advanced PHP features can be used to write such programs.This way you have the possibility
-to write cross-platform applications.
+but with a lot of experience advanced PHP features can be used to write such programs. This way you have the possibility to write cross-platform applications.
 
 PHP can be used on all major operating systems, including Linux, many Unix flavors (including HP-UX, Solaris, and OpenBSD),
-Microsoft Windows, macOS, RISC OS, and many others.PHP also supports most of the web servers in use today.This includes Apache,
-Microsoft Internet Information Server, Personal Web Server, Netscape and iPlanet servers, and many others.For the majority
+Microsoft Windows, macOS, RISC OS, and many others. PHP also supports most of the web servers in use today. This includes Apache,
+Microsoft Internet Information Server, Personal Web Server, Netscape and iPlanet servers, and many others. For the majority
 of servers PHP provides its own module, for the others that support the CGI standard PHP can work as a CGI processor <<PHP>>.
 
 [#_object_oriented_programming]
 === Object-oriented programming
-Object-oriented programming (OOP for short) is a programming paradigm based on the concept of object orientation.The basic
-idea is to align the architecture of a software with the basic structures of that domain of reality which concerns the given application.
-To reduce the complexity of representing reality in a software, object-oriented programming follows four principles:
+Object-oriented programming (OOP for short) is a programming paradigm based on the concept of object orientation. The basic
+idea is to align the architecture of a software with the basic structures of that domain of reality which concerns the given application. To reduce the complexity of representing reality in a software, object-oriented programming follows four principles:
 Abstraction, Inheritance, Encapsulation and Polymorphism <<OOP>>.
 
 ==== Abstraction
-Abstraction is one of the key concepts of object-oriented programming.The main goal is to manage the complexity of the
-program by hiding unnecessary details from the user.This allows the user to implement more complex logic on the abstraction
+Abstraction is one of the key concepts of object-oriented programming. The main goal is to manage the complexity of the
+program by hiding unnecessary details from the user. This allows the user to implement more complex logic on the abstraction
 provided without understanding or even thinking about all the hidden complexity <<OOP>>.
 
 ==== Inheritance
@@ -96,16 +83,11 @@ which concrete method to call <<OOP>>.
 
 == Comparison between PHP and Go on object-oriented programming
 This section shows how the programming languages PHP and Go implement the aspects of object-oriented programming presented
-in Section <<_object_oriented_programming, 2.3>> Code examples are given for PHP and Go for all aspects. The examples are simplified code snippets from the
-code project for a banking system.
+in Section <<_object_oriented_programming, 2.3>> Code examples are given for PHP and Go for all aspects. The examples are simplified code snippets from the code project for a banking system.
 
 === Abstraction in PHP and Go
 Abstraction is realized in PHP through abstract classes and methods. An abstract class has at least one abstract method.
-Abstract methods provide only the declaration of the signature of the method, but the implementation is left to the subclasses.
-In the implementation, the subclasses have some freedom such as adding additional arguments or changing the visibility of
-the method to a higher level. An abstract class or method is defined with the abstract keyword <<PHPDocs>>. The following code snippets show
-an example from the code project of an abstract method _showInfos()_ of the abstract class _bank_ account which is implemented
-differently by the two subclasses _savingsAccount_ and _checkingAccount_.
+Abstract methods provide only the declaration of the signature of the method, but the implementation is left to the subclasses. In the implementation, the subclasses have some freedom such as adding additional arguments or changing the visibility of the method to a higher level. An abstract class or method is defined with the abstract keyword <<PHPDocs>>. The following code snippets show an example from the code project of an abstract method _showInfos()_ of the abstract class _bank_ account which is implemented differently by the two subclasses _savingsAccount_ and _checkingAccount_.
 
 [source, php]
 abstract class BankAccount
@@ -237,10 +219,7 @@ private float $interestRate;
     }
 }
 
-Since Go does not support the typical inheritance via classes, some kind of inheritance is realized through embedding structures.
-Structs cannot be extended directly, but use a concept called composition, where the struct is used to form other objects.
-With composition, both the attributes and the methods of the base struct can be embedded and called in the child struct <<GoDocs>>.
-The following example shows the realization of inheritance in Go using the example of the banking system.
+Since Go does not support the typical inheritance via classes, some kind of inheritance is realized through embedding structures. Structs cannot be extended directly, but use a concept called composition, where the struct is used to form other objects. With composition, both the attributes and the methods of the base struct can be embedded and called in the child struct <<GoDocs>>. The following example shows the realization of inheritance in Go using the example of the banking system.
 
 [source, go]
 type bankAccount struct {
@@ -265,8 +244,7 @@ func main() {
 The access to a property, method or constant in PHP can be defined by prefixing the declaration with one of the keywords _public_,
 _protected_ or _private_. Publicly declared elements can be accessed from anywhere. Protected restricts access to parent classes
 and derived classes (as well as the class that defines the element). Private limits visibility only to the class that defines the element <<PHPDocs>>.
-For demonstration purposes, the code project was modified so that the three attributes have different visibilities.
-The _accountNumber_ can be called from anywhere, the _customer_ only in the _Models_ namespace and the _balance_ only in the _BankAccount_ class.
+For demonstration purposes, the code project was modified so that the three attributes have different visibilities. The _accountNumber_ can be called from anywhere, the _customer_ only in the _Models_ namespace and the _balance_ only in the _BankAccount_ class.
 
 [source, PHP]
 abstract class BankAccount
@@ -281,10 +259,7 @@ abstract class BankAccount
 
 Encapsulation in Go happens only at the package level. In contrast to PHP, Go has no _public_, _private_ or _protected_ keywords.
 Visibility is controlled by using formats with and without uppercase letters. Uppercase identifiers are exported and can be
-used outside of package, while lowercase identifiers are not exported and can only be accessed only within the same package.
-Visibility control can be applied to the following identifiers: structure, struct method, structure field, function, variable <<GoDocs>>.
-In the following example, it is not possible to access the bank account attribute _accountNumber_ in the _main_ package due to
-encapsulation. Since the _Balance_ attribute is capitalized, it can also be accessed from external packages such as _main_.
+used outside of package, while lowercase identifiers are not exported and can only be accessed only within the same package. Visibility control can be applied to the following identifiers: structure, struct method, structure field, function, variable <<GoDocs>>. In the following example, it is not possible to access the bank account attribute _accountNumber_ in the _main_ package due to encapsulation. Since the _Balance_ attribute is capitalized, it can also be accessed from external packages such as _main_.
 
 [source, go]
 package bank
@@ -304,10 +279,7 @@ func main() {
 
 === Polymorphism in PHP and Go
 Polymorphism in PHP can be implemented either by using interfaces or abstract classes. Interfaces are constructs that are
-similar to classes, with only one main difference. Interfaces define the method header, but not the functionality of the method.
-The implementation of the method is then done in those classes that implement this interface. These classes are obliged to
-implement all methods of the interface <<PHPDocs>>. The following two code snippets show the example of the _Banking_ interface and its
-implementation in the _Bank_ class.
+similar to classes, with only one main difference. Interfaces define the method header, but not the functionality of the method. The implementation of the method is then done in those classes that implement this interface. These classes are obliged to implement all methods of the interface <<PHPDocs>>. The following two code snippets show the example of the _Banking_ interface and its implementation in the _Bank_ class.
 
 [source, PHP]
 interface Banking

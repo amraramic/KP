@@ -119,7 +119,7 @@ class BankDemo
         $this->checkExit($lastname);
         try {
             $this->bank->createNewCustomer($firstname, $lastname);
-        } catch (Exception $e){
+        } catch (Exception $e) {
             echo $e->getMessage();
         }
     }
