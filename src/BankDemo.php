@@ -37,10 +37,9 @@ class BankDemo
     }
 
     function startMenu(){
-        echo("\nCreate customer = CUST, Create account = ACC, Do transaction = TRANS, Deposit = DEP, Debit = DEB,\n" .
+        echo  "\033[92m\n\nCreate customer = CUST, Create account = ACC, Do transaction = TRANS, Deposit = DEP, Debit = DEB,\n" .
             "See balance = BAL, Add interest = INTER, Deduct Account Maintenance Charge = MAINT, Overview = ALL\n".
-            "Delete customer = DELCUST, Delete account = DELACC, Back to start menu = EXIT\n\n"
-            . "What do you want to do? Type a key word: ");
+            "Delete customer = DELCUST, Delete account = DELACC, Back to start menu = EXIT\n\n\033[0m\n";
         $command = readline("What do you want wo do? Type key word: ");
         switch ($command){
             case "CUST":
@@ -111,11 +110,9 @@ class BankDemo
 
     function createCustomer(){
         echo "Please enter your data:\n";
-        echo "Firstname: ";
-        $firstname = readline();
+        $firstname = readline("Firstname: ");
         $this->checkExit($firstname);
-        echo "Lastname: ";
-        $lastname = readline();
+        $lastname = readline("Lastname: ");
         $this->checkExit($lastname);
         try {
             $this->bank->createNewCustomer($firstname, $lastname);
@@ -126,8 +123,7 @@ class BankDemo
 
     function createAccount(){
         echo "Please enter your data:\n";
-        echo "Customer number: ";
-        $customerNumber = readline();
+        $customerNumber = readline("Customer number: ");
         $this->checkExit($customerNumber);
         try {
             $this->bank->checkCustomerNumber((int) $customerNumber);
@@ -135,8 +131,7 @@ class BankDemo
             echo $e->getErrorMessage();
             $this->startMenu();
         }
-        echo "Typ of account: (S = Savings/C = Checking): ";
-        $type = readline();
+        $type = readline("Typ of account: (S = Savings/C = Checking): ");
         $this->checkExit($type);
         try {
             $this->bank->createNewAccount((int) $customerNumber, $type);
@@ -147,8 +142,7 @@ class BankDemo
 
     function doTransaction(){
         echo "Please enter the data:\n";
-        echo "From: ";
-        $from = readline();
+        $from = readline("From: ");
         $this->checkExit($from);
         try {
             $this->bank->checkAccountNumber($from);
@@ -156,8 +150,7 @@ class BankDemo
             echo $e->getErrorMessage();
             $this->startMenu();
         }
-        echo "To: ";
-        $to = readline();
+        $to = readline("To: ");
         $this->checkExit($to);
         try {
             $this->bank->checkAccountNumber($to);
@@ -165,8 +158,7 @@ class BankDemo
             echo $e->getErrorMessage();
             $this->startMenu();
         }
-        echo "Amount: ";
-        $amount = readline();
+        $amount = readline("Amount: ");
         $this->checkExit($amount);
 
         try {
@@ -180,8 +172,7 @@ class BankDemo
 
     function deposit(){
         echo "Please enter the data:\n";
-        echo "Account number: ";
-        $account = readline();
+        $account = readline("Account number: ");
         $this->checkExit($account);
         try {
             $this->bank->checkAccountNumber($account);
@@ -189,8 +180,7 @@ class BankDemo
             echo $e->getErrorMessage();
             $this->startMenu();
         }
-        echo "Amount: ";
-        $amount = readline();
+        $amount = readline("Amount: ");
         $this->checkExit($amount);
         try{
             $this->bank->doDeposit($account, (float) $amount);
@@ -201,8 +191,7 @@ class BankDemo
 
     function debit(){
         echo "Please enter the data:\n";
-        echo "Account number: ";
-        $account = readline();
+        $account = readline("Account number: ");
         $this->checkExit($account);
         try {
             $this->bank->checkAccountNumber($account);
@@ -210,8 +199,7 @@ class BankDemo
             echo $e->getErrorMessage();
             $this->startMenu();
         }
-        echo "Amount: ";
-        $amount = readline();
+        $amount = readline("Amount: ");
         $this->checkExit($amount);
         try{
             $this->bank->doDebit($account, (float) $amount);
@@ -222,8 +210,7 @@ class BankDemo
 
     function showBalance(){
         echo "Please enter the data:\n";
-        echo "Account number: ";
-        $account = readline();
+        $account = readline("Account number: ");
         $this->checkExit($account);
         try {
             $this->bank->checkAccountNumber($account);
@@ -238,8 +225,7 @@ class BankDemo
 
     function addInterest(){
         echo "Please enter the data:\n";
-        echo "Account number: ";
-        $account = readline();
+        $account = readline("Account number: ");
         $this->checkExit($account);
         try {
             $this->bank->checkAccountNumber($account);
@@ -255,8 +241,7 @@ class BankDemo
     }
 
     function deductMaintenanceCharge() {
-        echo "Account number: ";
-        $account = readline();
+        $account = readline("Account number: ");
         $this->checkExit($account);
         try {
             $this->bank->checkAccountNumber($account);
@@ -273,8 +258,7 @@ class BankDemo
 
     function deleteCustomer(){
         echo "Attention: If you delete this customer, all his/her accounts will be deleted!\n";
-        echo "Customer number: ";
-        $customer = readline();
+        $customer = readline("Customer number: ");
         $this->checkExit($customer);
         try {
             $this->bank->checkCustomerNumber((int)$customer);
@@ -286,8 +270,7 @@ class BankDemo
     }
 
     function deleteAccount(){
-        echo "Account number: ";
-        $account = readline();
+        $account = readline("Account number: ");
         $this->checkExit($account);
         try {
             $this->bank->checkAccountNumber($account);
@@ -299,9 +282,14 @@ class BankDemo
     }
 
     function showAll(){
+        $customers = $this->bank->getCustomers();
+        print_r("\tCustNr\t|\tName\n");
+        foreach ($customers as $customer) {
+            print_r("\t".$customer->getCustomerNumber()."\t|\t".$customer->getFirstName()." ".$customer->getLastName()."\n");
+        }
         $savingsAccounts = $this->bank->getSavingsAccounts();
         $checkingAccounts = $this->bank->getCheckingAccounts();
-        print_r("AccNr |      AccType       | CustNr | Firstname | Lastname | Balance | Interesst rate | Account maintenance charge \n");
+        print_r("\n\tAccNr\t|\t\tAccType\t\t|\tCustNr\t|\tBalance\t\t|\tInteresst rate\t\t|\tAccount maintenance charge\n");
         foreach ($savingsAccounts as $account){
             print_r($account->showInfos());
         }

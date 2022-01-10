@@ -29,12 +29,10 @@ class CheckingAccount extends BankAccount
      */
     public function showInfos(): string
     {
-        return $this->getAccountNumber()."   |  Checking account  |   ".
-            $this->getCustomer()->getCustomerNumber()."    |    " .
-            $this->getCustomer()->getFirstName()."   |   ".
-            $this->getCustomer()->getLastName()."  |  ".
-            $this->getBalance()."    |     ".
-            $this->getInterestRate()."        |     ".
+        return "\t".$this->getAccountNumber()."\t|\tChecking account\t|\t".
+            $this->getCustomer()->getCustomerNumber()."\t|\t" .
+            $this->getBalance()."\t\t|\t\t".
+            $this->getInterestRate()."\t\t|\t".
             $this->getAccountMaintenanceCharge()."\n";
     }
 

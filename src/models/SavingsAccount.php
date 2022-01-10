@@ -25,11 +25,9 @@ class SavingsAccount extends BankAccount
      */
     public function showInfos(): string
     {
-        return $this->getAccountNumber()."   |   Savings account  |   ".
-            $this->getCustomer()->getCustomerNumber()."    |    " .
-            $this->getCustomer()->getFirstName()."   |   ".
-            $this->getCustomer()->getLastName()."  |  ".
-            $this->getBalance()."     |    ".
+        return "\t".$this->getAccountNumber()."\t|\tSavings account\t\t|\t".
+            $this->getCustomer()->getCustomerNumber()."\t|\t" .
+            $this->getBalance()."\t\t|\t\t".
             $this->getInterestRate()."\n";
     }
 
