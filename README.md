@@ -15,6 +15,7 @@ The application is intended for the bank employee and contains the following fun
 - Delete account
 - View all accounts
 
+# How to start the program
 The application is operated via the Console and can be used from anywhere. 
 To start the application the following steps should be performed:
 - Install php (Version 8.1)
@@ -23,10 +24,11 @@ To start the application the following steps should be performed:
 - Navigate to the directory of the cloned repository
 - Execute php index.php
 
-Notes:
+# Notes
+- The paper (asciidoc and pdf) related to the project can be found in the docs folder
 - Not much emphasis was placed on the user interface, since the focus was on object-oriented programming and not on the GUI
 - Test coverage: 91% of the files coverage
   - Package exceptions: 100% Files coverage, 100% Lines coverage
-  - Package src: 100% Files coverage, 78% Lines coverage (because some methods were not tested twice e.g. doDebit() and debit())
+  - Package src: 100% Files coverage, 95% Lines coverage
 
 
